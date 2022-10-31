@@ -36,23 +36,3 @@ Then run the performance agent
 ```
 ./run_demo performance
 ```
-
-## To push changes in submodules
-
-To push changes in submodules first navigate to the submodule directory and do a git push
-
-```
-cd path-to-submodule (von-network or aries-cloudagent and so on)
-git add .
-git commit -m "changes in submodule"
-git push origin HEAD:main
-```
-
-Then go back to the main folder and do a git push
-
-```
-cd ..
-git add .
-git commit -m "changes in main repo"
-git push
-```
