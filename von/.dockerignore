@@ -1,0 +1,11 @@
+docker-compose.yml
+Dockerfile
+LICENSE
+manage
+README.md
+COMPLIANCE.yaml
+.git*
+tmp/
+backup/
+openshift/
+docs/
