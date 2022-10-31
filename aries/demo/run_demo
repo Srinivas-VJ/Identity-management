@@ -106,9 +106,9 @@ do
     cat <<EOF
 
 Usage:
-   ./demo_run <agent> [OPTIONS]
+   ./run_demo <agent> [OPTIONS]
 
-   - <agent> is one of alice, faber, acme, performance.
+   - <agent> is one of alice, faber, pes, acme, performance.
    - Options:
       --events - display on the terminal the webhook events from the ACA-Py agent.
       --timing - at the end of the run, display timing; relevant to the "performance" agent.
@@ -131,20 +131,29 @@ if [ "$AGENT" = "faber" ]; then
   AGENT_MODULE="faber"
   AGENT_PORT=8020
   AGENT_PORT_RANGE=8020-8029
+
+elif [ "$AGENT" = "pes" ]; then
+  AGENT_MODULE="pes"
+  AGENT_PORT=8100
+  AGENT_PORT_RANGE=8100-8109
+
 elif [ "$AGENT" = "alice" ]; then
   AGENT_MODULE="alice"
   AGENT_PORT=8030
   AGENT_PORT_RANGE=8030-8039
+
 elif [ "$AGENT" = "acme" ]; then
   AGENT_MODULE="acme"
   AGENT_PORT=8040
   AGENT_PORT_RANGE=8040-8049
+
 elif [ "$AGENT" = "performance" ]; then
   AGENT_MODULE="performance"
   AGENT_PORT=8050
   AGENT_PORT_RANGE=8050-8069
+
 else
-  echo "Please specify which agent you want to run. Choose from 'faber', 'alice', 'acme', or 'performance'."
+  echo "Please specify which agent you want to run. Choose from 'faber', 'pes', 'alice', 'acme', or 'performance'."
   exit 1
 fi
 
