@@ -11,8 +11,10 @@ cd indy-tails-server/docker/
 cd ../../aries/demo
 
 # start alice 
-TAILS_NETWORK=docker_tails-server ./run_demo alice --aip 10 --revocation --events 
+#TAILS_NETWORK=docker_tails-server ./run_demo alice --aip 10 --revocation --events 
 
 # start faber
+ngrok http 8020 > /dev/null &
 TAILS_NETWORK=docker_tails-server ./run_demo faber --aip 10 --revocation --events 
+
 
