@@ -1,0 +1,115 @@
+#!/bin/bash
+export MSYS_NO_PATHCONV=1
+# getDockerHost; for details refer to https://github.com/bcgov/DITP-DevOps/tree/main/code/snippets#getdockerhost
+. /dev/stdin <<<"$(cat <(curl -s --raw https://raw.githubusercontent.com/bcgov/DITP-DevOps/main/code/snippets/getDockerHost))" 
+export DOCKERHOST=$(getDockerHost)
+set -e
+
+SCRIPT_HOME="$(cd "$(dirname "$0")" && pwd)"
+
+# =================================================================================================================
+# Usage:
+# -----------------------------------------------------------------------------------------------------------------
+usage() {
+  cat <<-EOF
+      Usage: $0 [command] [options]
+      Commands:
+      build       - Build the tails-server docker images
+      start | up  - Run tails-server
+      logs        - To tail the logs of running containers (ctrl-c to exit).
+      stop | down - Stop tails-server
+      rm          - Stop tails-server and remove volumes
+EOF
+  exit 1
+}
+
+toLower() {
+  echo $(echo ${@} | tr '[:upper:]' '[:lower:]')
+}
+
+exportEnvironment() {
+  for arg in "$@"; do
+    case "$arg" in
+      *=*)
+        export "${arg}"
+        ;;
+      --logs)
+        TAIL_LOGS=1
+        ;;
+      *)
+        # If not recognized, save it for later procesing ...
+        set -- "$@" "$arg"
+        ;;
+    esac
+  done
+
+  export GENESIS_URL=${GENESIS_URL:-http://$DOCKERHOST:9000/genesis}
+  export STORAGE_PATH=${STORAGE_PATH:-/tmp/tails-files}
+  export LOG_LEVEL=${LOG_LEVEL:-INFO}
+  export TAILS_SERVER_URL=${TAILS_SERVER_URL:-http://$DOCKERHOST:6543}
+}
+
+function logs() {
+  (
+    local OPTIND
+    local unset _force
+    local unset no_tail
+    while getopts ":f-:" FLAG; do
+      case $FLAG in
+        f ) local _force=1 ;;
+        - ) 
+            case ${OPTARG} in
+                "no-tail"*) no_tail=1
+              ;;
+            esac
+      esac
+    done
+    shift $((OPTIND-1))
+
+    log_args=()
+    (( no_tail != 1 )) && log_args+=( '-f' )
+    if [ ! -z "${TAIL_LOGS}" ] || [ ! -z "${_force}" ]; then
+      docker-compose \
+        --log-level ERROR logs \
+         "${log_args[@]}" "$@"
+    fi
+  )
+}
+
+# =================================================================================================================
+
+pushd "${SCRIPT_HOME}" >/dev/null
+COMMAND=$(toLower ${1})
+shift || COMMAND=usage
+
+case "${COMMAND}" in
+build)
+  docker-compose build $@
+  ;;
+start|up)
+  exportEnvironment "$@"
+  docker-compose up -d ngrok-tails-server tails-server
+  logs
+  echo "Run './manage logs' for logs" 
+  ;;
+test)
+  exportEnvironment "$@"
+  docker-compose up -d ngrok-tails-server tails-server
+  docker-compose run tester --genesis-url $GENESIS_URL --tails-server-url $TAILS_SERVER_URL
+  # docker-compose down
+  ;;
+logs)
+  docker-compose logs -f
+  ;;
+stop)
+  docker-compose stop
+  ;;
+down|rm)
+  docker-compose down
+  ;;
+*)
+  usage
+  ;;
+esac
+
+popd >/dev/null
