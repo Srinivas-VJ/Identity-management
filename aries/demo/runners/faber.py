@@ -373,6 +373,8 @@ class FaberAgent(AriesAgent):
 
 
 async def main(args):
+    print("The args are:-----------------------------------------------------------------------------------------");
+    print(args);
     faber_agent = await create_agent_with_args(args, ident="faber")
 
     try:
