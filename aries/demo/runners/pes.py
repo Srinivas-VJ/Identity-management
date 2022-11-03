@@ -80,11 +80,15 @@ class PesAgent(AriesAgent):
         birth_date_format = "%Y%m%d"
         if aip == 10:
             # define attributes to send for credential
+            name = input("Enter student's name: ")
+            degree = input("Enter student's degree: ")
+            cgpa = input("Enter student's CGPA: ")
             self.cred_attrs[cred_def_id] = {
-                "name": "V Srinivas",
-                "date": "2022-10-29",
-                "degree": "Computer Science",
-                "birthdate_dateint": birth_date.strftime(birth_date_format),
+                "Name": name, 
+                "Issued_Date": datetime.date.today().strftime(birth_date_format),
+                "Degree": degree, 
+                "DOB": birth_date.strftime(birth_date_format),
+                "CGPA": cgpa,
                 "timestamp": str(int(time.time())),
             }
 
@@ -95,6 +99,7 @@ class PesAgent(AriesAgent):
                     for (n, v) in self.cred_attrs[cred_def_id].items()
                 ],
             }
+
             offer_request = {
                 "connection_id": self.connection_id,
                 "cred_def_id": cred_def_id,
@@ -107,13 +112,19 @@ class PesAgent(AriesAgent):
 
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
+                # define attributes to send for credential
+                name = input("Enter student's name: ")
+                degree = input("Enter student's degree: ")
+                cgpa = input("Enter student's CGPA: ")
                 self.cred_attrs[cred_def_id] = {
-                    "name": "V Srinivas",
-                    "date": "2022-10-29",
-                    "degree": "Maths",
-                    "birthdate_dateint": birth_date.strftime(birth_date_format),
+                    "Name": name, 
+                    "Issued_Date": datetime.date.today().strftime(birth_date_format),
+                    "Degree": degree, 
+                    "DOB": birth_date.strftime(birth_date_format),
+                    "CGPA": cgpa,
                     "timestamp": str(int(time.time())),
                 }
+
 
                 cred_preview = {
                     "@type": CRED_PREVIEW_TYPE,
@@ -373,7 +384,7 @@ class PesAgent(AriesAgent):
 
 
 async def main(args):
-    pes_agent = await create_agent_with_args(args, ident="pes")
+    pes_agent = await create_agent_with_args(args, ident="PES University")
 
     try:
         log_status(
@@ -385,7 +396,7 @@ async def main(args):
             )
         )
         agent = PesAgent(
-            "pes.agent",
+            "PES University", # name of the agent
             pes_agent.start_port,
             pes_agent.start_port + 1,
             genesis_data=pes_agent.genesis_txns,
@@ -402,12 +413,14 @@ async def main(args):
             endorser_role=pes_agent.endorser_role,
         )
 
-        pes_schema_name = "degree schema"
+        # Scema definition and credential definition
+        pes_schema_name = "Degree Schema"
         pes_schema_attrs = [
-            "name",
-            "date",
-            "degree",
-            "birthdate_dateint",
+            "Name",
+            "Issued_Date",
+            "Degree",
+            "DOB",
+            "CGPA",
             "timestamp",
         ]
         if pes_agent.cred_type == CRED_FORMAT_INDY:

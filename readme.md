@@ -1,5 +1,13 @@
 # Decentralised Identity Management using Blockchain
 
+To initialise mob client
+
+```
+./mob.sh AGENT_NAME
+```
+
+where AGENT_NAME is one of 'acme', 'pes', 'performance', 'faber' and so on..
+
 ## Setup VON network (Indy public ledger sandbox)
 
 ```
