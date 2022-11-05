@@ -181,27 +181,27 @@ class FaberAgent(AriesAgent):
         if aip == 10:
             req_attrs = [
                 {
-                    "name": "name",
-                    "restrictions": [{"schema_name": "degree schema"}],
+                    "name": "Name",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                 },
                 {
-                    "name": "date",
-                    "restrictions": [{"schema_name": "degree schema"}],
+                    "name": "Issued_Date",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                 },
             ]
             if revocation:
                 req_attrs.append(
                     {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}],
+                        "name": "Degree",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                         "non_revoked": {"to": int(time.time() - 1)},
                     },
                 )
             else:
                 req_attrs.append(
                     {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}],
+                        "name": "Degree",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                     }
                 )
             if SELF_ATTESTED:
@@ -212,10 +212,10 @@ class FaberAgent(AriesAgent):
             req_preds = [
                 # test zero-knowledge proofs
                 {
-                    "name": "birthdate_dateint",
+                    "name": "DOB",
                     "p_type": "<=",
                     "p_value": int(birth_date.strftime(birth_date_format)),
-                    "restrictions": [{"schema_name": "degree schema"}],
+                    "restrictions": [{"schema_name": "Degree Schema"}],
                 }
             ]
             indy_proof_request = {

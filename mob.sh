@@ -1,11 +1,14 @@
-start von
+# kill everything and everyone
+killall ngrok
+
+# start von
 cd von/
 ./manage build
 ./manage start
 
 echo "started von"
 
-sleep 3
+# sleep 3
 
 cd ..
 # start tail server
@@ -42,10 +45,6 @@ ngrok http $AGENT_PORT > /dev/null &
 
 echo "started ngrok"
 
-sleep 3
+# sleep 3
 
 TAILS_NETWORK=docker_tails-server LEDGER_URL=http://test.bcovrin.vonx.io ./run_demo "$1" --aip 10 --revocation --events 
-
-# TAILS_NETWORK=docker_tails-server LEDGER_URL=http://test.bcovrin.vonx.io ./run_demo acme --aip 10 --revocation --events 
-
-# TAILS_NETWORK=docker_tails-server LEDGER_URL=http://test.bcovrin.vonx.io ./run_demo acme --aip 10 --revocation --events 

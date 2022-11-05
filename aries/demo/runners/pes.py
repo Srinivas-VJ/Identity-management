@@ -36,6 +36,23 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
+# degree schema, grade card schema,student application schema
+schemas = {};
+schemas["Degree"] = ["Name", "Issued_Date", "Degree", "Major", "GPA", "University"];
+schemas["GradeCard"] = ["Name", "Issued_Date", "Semester", "Marks", "GPA", "University"];
+
+# requests_set = {};
+# requests_set["studentDetails"] = [
+#                 {
+#                     "name": "Name",
+#                     "restrictions": [{"schema_name": "Degree Schema"}],
+#                 },
+#                 {
+#                     "name": "Issued_Date",
+#                     "restrictions": [{"schema_name": "Degree Schema"}],
+#                 },
+#             ];
+
 
 class PesAgent(AriesAgent):
     def __init__(
@@ -74,24 +91,29 @@ class PesAgent(AriesAgent):
         return self._connection_ready.done() and self._connection_ready.result()
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
+        birth_date_format = "%Y%m%d"
+        print("Enter Schema Name: ")
+        print("Options: ", schemas.keys())
+        schema_type = input();
+        payload = {};
+        for attr in schemas[schema_type]:
+            print("Enter ", attr, ": ")
+            payload[attr] = input();
+            if attr == "Issued_Date":
+                payload[attr] = datetime.datetime.now().strftime(birth_date_format);
+        payload["timestamp"] = str(int(time.time()));
+
+        print(payload);
+
         age = 22
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
-        birth_date_format = "%Y%m%d"
         if aip == 10:
             # define attributes to send for credential
             name = input("Enter student's name: ")
             degree = input("Enter student's degree: ")
             cgpa = input("Enter student's CGPA: ")
-            self.cred_attrs[cred_def_id] = {
-                "Name": name, 
-                "Issued_Date": datetime.date.today().strftime(birth_date_format),
-                "Degree": degree, 
-                "DOB": birth_date.strftime(birth_date_format),
-                "CGPA": cgpa,
-                "timestamp": str(int(time.time())),
-            }
-
+            self.cred_attrs[cred_def_id] = payload 
             cred_preview = {
                 "@type": CRED_PREVIEW_TYPE,
                 "attributes": [
@@ -116,15 +138,7 @@ class PesAgent(AriesAgent):
                 name = input("Enter student's name: ")
                 degree = input("Enter student's degree: ")
                 cgpa = input("Enter student's CGPA: ")
-                self.cred_attrs[cred_def_id] = {
-                    "Name": name, 
-                    "Issued_Date": datetime.date.today().strftime(birth_date_format),
-                    "Degree": degree, 
-                    "DOB": birth_date.strftime(birth_date_format),
-                    "CGPA": cgpa,
-                    "timestamp": str(int(time.time())),
-                }
-
+                self.cred_attrs[cred_def_id] = payload
 
                 cred_preview = {
                     "@type": CRED_PREVIEW_TYPE,
@@ -192,27 +206,27 @@ class PesAgent(AriesAgent):
         if aip == 10:
             req_attrs = [
                 {
-                    "name": "name",
-                    "restrictions": [{"schema_name": "degree schema"}],
+                    "name": "Name",
+                    "restrictions": [{"schema_name": "Degree Schema"}],
                 },
                 {
-                    "name": "date",
-                    "restrictions": [{"schema_name": "degree schema"}],
+                    "name": "Issued_Date",
+                    "restrictions": [{"schema_name": "Degree Schema"}],
                 },
             ]
             if revocation:
                 req_attrs.append(
                     {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}],
+                        "name": "Degree",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                         "non_revoked": {"to": int(time.time() - 1)},
                     },
                 )
             else:
                 req_attrs.append(
                     {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}],
+                        "name": "Degree",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                     }
                 )
             if SELF_ATTESTED:
@@ -223,10 +237,10 @@ class PesAgent(AriesAgent):
             req_preds = [
                 # test zero-knowledge proofs
                 {
-                    "name": "birthdate_dateint",
+                    "name": "DOB",
                     "p_type": "<=",
                     "p_value": int(birth_date.strftime(birth_date_format)),
-                    "restrictions": [{"schema_name": "degree schema"}],
+                    "restrictions": [{"schema_name": "Degree Schema"}],
                 }
             ]
             indy_proof_request = {
@@ -423,21 +437,22 @@ async def main(args):
             "CGPA",
             "timestamp",
         ]
-        if pes_agent.cred_type == CRED_FORMAT_INDY:
-            pes_agent.public_did = True
-            await pes_agent.initialize(
-                the_agent=agent,
-                schema_name=pes_schema_name,
-                schema_attrs=pes_schema_attrs,
-                create_endorser_agent=(pes_agent.endorser_role == "author")
-                if pes_agent.endorser_role
-                else False,
-            )
-        elif pes_agent.cred_type == CRED_FORMAT_JSON_LD:
-            pes_agent.public_did = True
-            await pes_agent.initialize(the_agent=agent)
-        else:
-            raise Exception("Invalid credential type:" + pes_agent.cred_type)
+        for (schema_name, schema_attrs) in schemas.items():
+            if pes_agent.cred_type == CRED_FORMAT_INDY:
+                pes_agent.public_did = True
+                await pes_agent.initialize(
+                    the_agent=agent,
+                    schema_name=schema_name,
+                    schema_attrs=schema_attrs,
+                    create_endorser_agent=(pes_agent.endorser_role == "author")
+                    if pes_agent.endorser_role
+                    else False,
+                )
+            elif pes_agent.cred_type == CRED_FORMAT_JSON_LD:
+                pes_agent.public_did = True
+                await pes_agent.initialize(the_agent=agent)
+            else:
+                raise Exception("Invalid credential type:" + pes_agent.cred_type)
 
         # generate an invitation for Alice
         await pes_agent.generate_invitation(
@@ -519,6 +534,8 @@ async def main(args):
 
             elif option == "1":
                 log_status("#13 Issue credential offer to X")
+               
+                
 
                 if pes_agent.aip == 10:
                     offer_request = pes_agent.agent.generate_credential_offer(

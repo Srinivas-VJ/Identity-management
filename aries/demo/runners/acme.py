@@ -261,16 +261,16 @@ async def main(args):
                 # presentation requests
                 req_attrs = [
                     {
-                        "name": "name",
-                        "restrictions": [{"schema_name": "degree schema"}]
+                        "name": "Name",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                     },
                     {
-                        "name": "date",
-                        "restrictions": [{"schema_name": "degree schema"}]
+                        "name": "CGPA",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                     },
                     {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}]
+                        "name": "Degree",
+                        "restrictions": [{"schema_name": "Degree Schema"}],
                     }
                 ]
                 req_preds = []
