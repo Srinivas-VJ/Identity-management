@@ -74,6 +74,7 @@ class FaberAgent(AriesAgent):
         return self._connection_ready.done() and self._connection_ready.result()
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
+        # name = input("NAME")
         age = 24
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)

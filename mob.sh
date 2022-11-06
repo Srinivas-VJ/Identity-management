@@ -1,4 +1,6 @@
-start von
+killall ngrok
+
+# start von
 cd von/
 ./manage build
 ./manage start

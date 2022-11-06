@@ -74,15 +74,16 @@ class PesAgent(AriesAgent):
         return self._connection_ready.done() and self._connection_ready.result()
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
+        name = input("Enter student's name: ")
+        degree = input("Enter student's degree: ")
+        cgpa = input("Enter student's CGPA: ")
         age = 22
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d"
         if aip == 10:
             # define attributes to send for credential
-            name = input("Enter student's name: ")
-            degree = input("Enter student's degree: ")
-            cgpa = input("Enter student's CGPA: ")
+
             self.cred_attrs[cred_def_id] = {
                 "Name": name, 
                 "Issued_Date": datetime.date.today().strftime(birth_date_format),
@@ -113,9 +114,6 @@ class PesAgent(AriesAgent):
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
                 # define attributes to send for credential
-                name = input("Enter student's name: ")
-                degree = input("Enter student's degree: ")
-                cgpa = input("Enter student's CGPA: ")
                 self.cred_attrs[cred_def_id] = {
                     "Name": name, 
                     "Issued_Date": datetime.date.today().strftime(birth_date_format),
