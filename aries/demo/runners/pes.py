@@ -36,6 +36,11 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
+schemas = {};
+
+schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
+# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+
 
 class PesAgent(AriesAgent):
     def __init__(
@@ -74,24 +79,22 @@ class PesAgent(AriesAgent):
         return self._connection_ready.done() and self._connection_ready.result()
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
-        name = input("Enter student's name: ")
-        degree = input("Enter student's degree: ")
-        cgpa = input("Enter student's CGPA: ")
-        age = 22
-        d = datetime.date.today()
-        birth_date = datetime.date(d.year - age, d.month, d.day)
+        # new
         birth_date_format = "%Y%m%d"
+        payload = {};
+        type = "Degree";
+        for attr in schemas[type]:
+            if attr == "Issued date":
+                payload[attr] = datetime.datetime.now().strftime(birth_date_format)
+                continue;
+            if attr == "Timestamp":
+                payload[attr] = str(int(time.time())) 
+                continue;
+            payload[attr] = input("Enter " + attr + ": ")
         if aip == 10:
             # define attributes to send for credential
 
-            self.cred_attrs[cred_def_id] = {
-                "Name": name, 
-                "Issued_Date": datetime.date.today().strftime(birth_date_format),
-                "Degree": degree, 
-                "DOB": birth_date.strftime(birth_date_format),
-                "CGPA": cgpa,
-                "timestamp": str(int(time.time())),
-            }
+            self.cred_attrs[cred_def_id] = payload
 
             cred_preview = {
                 "@type": CRED_PREVIEW_TYPE,
@@ -114,16 +117,7 @@ class PesAgent(AriesAgent):
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
                 # define attributes to send for credential
-                self.cred_attrs[cred_def_id] = {
-                    "Name": name, 
-                    "Issued_Date": datetime.date.today().strftime(birth_date_format),
-                    "Degree": degree, 
-                    "DOB": birth_date.strftime(birth_date_format),
-                    "CGPA": cgpa,
-                    "timestamp": str(int(time.time())),
-                }
-
-
+                self.cred_attrs[cred_def_id] = payload 
                 cred_preview = {
                     "@type": CRED_PREVIEW_TYPE,
                     "attributes": [
@@ -421,12 +415,13 @@ async def main(args):
             "CGPA",
             "timestamp",
         ]
+        # degree schema
         if pes_agent.cred_type == CRED_FORMAT_INDY:
             pes_agent.public_did = True
             await pes_agent.initialize(
                 the_agent=agent,
-                schema_name=pes_schema_name,
-                schema_attrs=pes_schema_attrs,
+                schema_name = "Degree",
+                schema_attrs = schemas["Degree"],
                 create_endorser_agent=(pes_agent.endorser_role == "author")
                 if pes_agent.endorser_role
                 else False,
@@ -502,10 +497,11 @@ async def main(args):
                 # TODO check first in case we are switching between existing wallets
                 if created:
                     # TODO this fails because the new wallet doesn't get a public DID
-                    await pes_agent.create_schema_and_cred_def(
-                        schema_name=pes_schema_name,
-                        schema_attrs=pes_schema_attrs,
-                    )
+                    for schema in schemas.keys():
+                        await pes_agent.create_schema_and_cred_def(
+                            schema_name=schema,
+                            schema_attrs=schemas[schema],
+                        )
 
             elif option in "tT":
                 exchange_tracing = not exchange_tracing
@@ -517,7 +513,6 @@ async def main(args):
 
             elif option == "1":
                 log_status("#13 Issue credential offer to X")
-
                 if pes_agent.aip == 10:
                     offer_request = pes_agent.agent.generate_credential_offer(
                         pes_agent.aip, None, pes_agent.cred_def_id, exchange_tracing
