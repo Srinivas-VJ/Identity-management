@@ -40,6 +40,9 @@ schemas = {};
 
 schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
 schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
+
+ids = {};
 # bois just add whatever schema you want here
 
 
@@ -85,6 +88,7 @@ class PesAgent(AriesAgent):
         for key in schemas.keys():
             print(key)
         type = input(); 
+        cred_def_id = ids[type];
         birth_date_format = "%Y%m%d"
         payload = {};
         for attr in schemas[type]:
@@ -430,8 +434,8 @@ async def main(args):
             pes_agent.public_did = True
             await pes_agent.initialize(
                 the_agent=agent,
-                schema_name = type,
-                schema_attrs = schemas[type],
+                schema_name = None,
+                schema_attrs = None,
                 create_endorser_agent=(pes_agent.endorser_role == "author")
                 if pes_agent.endorser_role
                 else False,
@@ -442,7 +446,10 @@ async def main(args):
         else:
             raise Exception("Invalid credential type:" + pes_agent.cred_type)
         
-        
+        # register schemas and cred defs
+        for schema in schemas.keys():
+            ids[schema] = await pes_agent.create_schema_and_cred_def(schema, schemas[schema]);
+        print(ids);
 
         # generate an invitation for Alice
         await pes_agent.generate_invitation(
