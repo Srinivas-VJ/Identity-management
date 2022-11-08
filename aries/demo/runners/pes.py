@@ -39,7 +39,8 @@ LOGGER = logging.getLogger(__name__)
 schemas = {};
 
 schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
-# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+# bois just add whatever schema you want here
 
 
 class PesAgent(AriesAgent):
@@ -80,9 +81,12 @@ class PesAgent(AriesAgent):
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
         # new
+        print("Enter the type of credential you want to issue");
+        for key in schemas.keys():
+            print(key)
+        type = input(); 
         birth_date_format = "%Y%m%d"
         payload = {};
-        type = "Degree";
         for attr in schemas[type]:
             if attr == "Issued date":
                 payload[attr] = datetime.datetime.now().strftime(birth_date_format)
@@ -415,13 +419,19 @@ async def main(args):
             "CGPA",
             "timestamp",
         ]
-        # degree schema
+        print("Enter the type of credential you want to issue");
+        for key in schemas.keys():
+            print(key)
+        type = input();
+
+        
+
         if pes_agent.cred_type == CRED_FORMAT_INDY:
             pes_agent.public_did = True
             await pes_agent.initialize(
                 the_agent=agent,
-                schema_name = "Degree",
-                schema_attrs = schemas["Degree"],
+                schema_name = type,
+                schema_attrs = schemas[type],
                 create_endorser_agent=(pes_agent.endorser_role == "author")
                 if pes_agent.endorser_role
                 else False,
@@ -431,6 +441,8 @@ async def main(args):
             await pes_agent.initialize(the_agent=agent)
         else:
             raise Exception("Invalid credential type:" + pes_agent.cred_type)
+        
+        
 
         # generate an invitation for Alice
         await pes_agent.generate_invitation(
@@ -497,6 +509,7 @@ async def main(args):
                 # TODO check first in case we are switching between existing wallets
                 if created:
                     # TODO this fails because the new wallet doesn't get a public DID
+                    print("i am here and the lord is with me")
                     for schema in schemas.keys():
                         await pes_agent.create_schema_and_cred_def(
                             schema_name=schema,
