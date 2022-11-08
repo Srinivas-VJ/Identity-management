@@ -39,11 +39,11 @@ LOGGER = logging.getLogger(__name__)
 schemas = {};
 
 schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
-schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
-schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
+# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+# schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
 
-ids = {};
-# bois just add whatever schema you want here
+ids = {}
+# just add whatever schema you want here
 
 
 class PesAgent(AriesAgent):
@@ -84,7 +84,7 @@ class PesAgent(AriesAgent):
 
     def generate_credential_offer(self, aip, cred_type, cred_def_id, exchange_tracing):
         # new
-        print("Enter the type of credential you want to issue");
+        print("Enter the type of credential you want to issue")
         for key in schemas.keys():
             print(key)
         type = input(); 
@@ -413,20 +413,16 @@ async def main(args):
             endorser_role=pes_agent.endorser_role,
         )
 
-        # Scema definition and credential definition
-        pes_schema_name = "Degree Schema"
-        pes_schema_attrs = [
-            "Name",
-            "Issued_Date",
-            "Degree",
-            "DOB",
-            "CGPA",
-            "timestamp",
-        ]
-        print("Enter the type of credential you want to issue");
-        for key in schemas.keys():
-            print(key)
-        type = input();
+        # Schema definition and credential definition
+        # pes_schema_name = "Degree Schema"
+        # pes_schema_attrs = [
+        #     "Name",
+        #     "Issued_Date",
+        #     "Degree",
+        #     "DOB",
+        #     "CGPA",
+        #     "timestamp",
+        # ]
 
         
 
@@ -448,8 +444,8 @@ async def main(args):
         
         # register schemas and cred defs
         for schema in schemas.keys():
-            ids[schema] = await pes_agent.create_schema_and_cred_def(schema, schemas[schema]);
-        print(ids);
+            ids[schema] = await pes_agent.create_schema_and_cred_def(schema, schemas[schema])
+        # print(ids);
 
         # generate an invitation for Alice
         await pes_agent.generate_invitation(
@@ -457,7 +453,9 @@ async def main(args):
         )
 
         exchange_tracing = False
+
         options = (
+            "    (0) Register Schema\n"
             "    (1) Issue Credential\n"
             "    (2) Send Proof Request\n"
             "    (2a) Send *Connectionless* Proof Request (requires a Mobile client)\n"
@@ -516,7 +514,7 @@ async def main(args):
                 # TODO check first in case we are switching between existing wallets
                 if created:
                     # TODO this fails because the new wallet doesn't get a public DID
-                    print("i am here and the lord is with me")
+                    # print("i am here and the lord is with me")
                     for schema in schemas.keys():
                         await pes_agent.create_schema_and_cred_def(
                             schema_name=schema,
@@ -531,6 +529,19 @@ async def main(args):
                     )
                 )
 
+            elif option == "0":
+                log_status("#69 Registering a new Schema")
+                try:
+                    name = input("Enter Schema Name: \n")
+                    attrs = input("Enter space separated fields for the schema: \n").split()
+                    ids[name] = await pes_agent.create_schema_and_cred_def(
+                            schema_name=name,
+                            schema_attrs=attrs,
+                        )
+                    schemas[name] = attrs
+                except Exception as e:
+                    print(e)
+                
             elif option == "1":
                 log_status("#13 Issue credential offer to X")
                 if pes_agent.aip == 10:
