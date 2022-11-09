@@ -41,11 +41,10 @@ schemas = {};
 schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
 # schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
 # schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
-
-ids = {}
 # just add whatever schema you want here
 
-
+# will store cred_def_ids of different schemas
+ids = {}
 class PesAgent(AriesAgent):
     def __init__(
         self,
@@ -189,48 +188,72 @@ class PesAgent(AriesAgent):
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d"
-        if aip == 10:
-            req_attrs = [
-                {
-                    "name": "name",
-                    "restrictions": [{"schema_name": "degree schema"}],
-                },
-                {
-                    "name": "date",
-                    "restrictions": [{"schema_name": "degree schema"}],
-                },
-            ]
-            if revocation:
-                req_attrs.append(
+        print("Enter the type of credential you want proof for")
+        for key in schemas.keys():
+            print(key)
+        type = input();
+
+        req_attrs = [];
+        req_preds = [];
+        for attr in schemas[type]:
+            if attr == "Timestamp":
+                req_preds.append(
                     {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}],
-                        "non_revoked": {"to": int(time.time() - 1)},
-                    },
-                )
-            else:
-                req_attrs.append(
-                    {
-                        "name": "degree",
-                        "restrictions": [{"schema_name": "degree schema"}],
+                        "name": attr,
+                        "p_type": ">=",
+                        "p_value": 1630000000,
+                        "restrictions": [{"schema_name": type}],
                     }
                 )
-            if SELF_ATTESTED:
-                # test self-attested claims
-                req_attrs.append(
-                    {"name": "self_attested_thing"},
-                )
-            req_preds = [
-                # test zero-knowledge proofs
-                {
-                    "name": "birthdate_dateint",
-                    "p_type": "<=",
-                    "p_value": int(birth_date.strftime(birth_date_format)),
-                    "restrictions": [{"schema_name": "degree schema"}],
-                }
-            ]
+                req_attrs.append({"name": attr, "restrictions": [{"schema_name": type}]})
+        
+
+
+
+
+        if aip == 10:
+            # req_attrs = [
+            #     {
+            #         "name": "name",
+            #         "restrictions": [{"schema_name": "degree schema"}],
+            #     },
+            #     {
+            #         "name": "date",
+            #         "restrictions": [{"schema_name": "degree schema"}],
+            #     },
+            # ]
+            # if revocation:
+            #     req_attrs.append(
+            #         {
+            #             "name": "degree",
+            #             "restrictions": [{"schema_name": "degree schema"}],
+            #             "non_revoked": {"to": int(time.time() - 1)},
+            #         },
+            #     )
+            # else:
+            #     req_attrs.append(
+            #         {
+            #             "name": "degree",
+            #             "restrictions": [{"schema_name": "degree schema"}],
+            #         }
+            #     )
+            # if SELF_ATTESTED:
+            #     # test self-attested claims
+            #     req_attrs.append(
+            #         {"name": "self_attested_thing"},
+            #     )
+            # req_preds = [
+            #     # test zero-knowledge proofs
+            #     {
+            #         "name": "birthdate_dateint",
+            #         "p_type": "<=",
+            #         "p_value": int(birth_date.strftime(birth_date_format)),
+            #         "restrictions": [{"schema_name": "degree schema"}],
+            #     }
+            # ]
+
             indy_proof_request = {
-                "name": "Proof of Education",
+                "name": "Proof of " + type,
                 "version": "1.0",
                 "requested_attributes": {
                     f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -253,47 +276,47 @@ class PesAgent(AriesAgent):
 
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
-                req_attrs = [
-                    {
-                        "name": "name",
-                        "restrictions": [{"schema_name": "degree schema"}],
-                    },
-                    {
-                        "name": "date",
-                        "restrictions": [{"schema_name": "degree schema"}],
-                    },
-                ]
-                if revocation:
-                    req_attrs.append(
-                        {
-                            "name": "degree",
-                            "restrictions": [{"schema_name": "degree schema"}],
-                            "non_revoked": {"to": int(time.time() - 1)},
-                        },
-                    )
-                else:
-                    req_attrs.append(
-                        {
-                            "name": "degree",
-                            "restrictions": [{"schema_name": "degree schema"}],
-                        }
-                    )
-                if SELF_ATTESTED:
-                    # test self-attested claims
-                    req_attrs.append(
-                        {"name": "self_attested_thing"},
-                    )
-                req_preds = [
-                    # test zero-knowledge proofs
-                    {
-                        "name": "birthdate_dateint",
-                        "p_type": "<=",
-                        "p_value": int(birth_date.strftime(birth_date_format)),
-                        "restrictions": [{"schema_name": "degree schema"}],
-                    }
-                ]
+                # req_attrs = [
+                #     {
+                #         "name": "name",
+                #         "restrictions": [{"schema_name": "degree schema"}],
+                #     },
+                #     {
+                #         "name": "date",
+                #         "restrictions": [{"schema_name": "degree schema"}],
+                #     },
+                # ]
+                # if revocation:
+                #     req_attrs.append(
+                #         {
+                #             "name": "degree",
+                #             "restrictions": [{"schema_name": "degree schema"}],
+                #             "non_revoked": {"to": int(time.time() - 1)},
+                #         },
+                #     )
+                # else:
+                #     req_attrs.append(
+                #         {
+                #             "name": "degree",
+                #             "restrictions": [{"schema_name": "degree schema"}],
+                #         }
+                #     )
+                # if SELF_ATTESTED:
+                #     # test self-attested claims
+                #     req_attrs.append(
+                #         {"name": "self_attested_thing"},
+                #     )
+                # req_preds = [
+                #     # test zero-knowledge proofs
+                #     {
+                #         "name": "birthdate_dateint",
+                #         "p_type": "<=",
+                #         "p_value": int(birth_date.strftime(birth_date_format)),
+                #         "restrictions": [{"schema_name": "degree schema"}],
+                #     }
+                # ]
                 indy_proof_request = {
-                    "name": "Proof of Education",
+                    "name": "Proof of " + type,
                     "version": "1.0",
                     "requested_attributes": {
                         f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -304,8 +327,8 @@ class PesAgent(AriesAgent):
                     },
                 }
 
-                if revocation:
-                    indy_proof_request["non_revoked"] = {"to": int(time.time())}
+                # if revocation:
+                #     indy_proof_request["non_revoked"] = {"to": int(time.time())}
 
                 proof_request_web_request = {
                     "presentation_request": {"indy": indy_proof_request},
