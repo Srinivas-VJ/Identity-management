@@ -89,7 +89,7 @@ class PesAgent(AriesAgent):
         type = input(); 
         cred_def_id = ids[type];
         birth_date_format = "%Y%m%d"
-        payload = {};
+        payload = {}
         for attr in schemas[type]:
             if attr == "Issued date":
                 payload[attr] = datetime.datetime.now().strftime(birth_date_format)
@@ -191,10 +191,10 @@ class PesAgent(AriesAgent):
         print("Enter the type of credential you want proof for")
         for key in schemas.keys():
             print(key)
-        type = input();
+        type = input()
 
-        req_attrs = [];
-        req_preds = [];
+        req_attrs = []
+        req_preds = []
         for attr in schemas[type]:
             if attr == "Timestamp":
                 req_preds.append(
@@ -205,11 +205,9 @@ class PesAgent(AriesAgent):
                         "restrictions": [{"schema_name": type}],
                     }
                 )
-                req_attrs.append({"name": attr, "restrictions": [{"schema_name": type}]})
+                continue
+            req_attrs.append({"name": attr, "restrictions": [{"schema_name": type}]})
         
-
-
-
 
         if aip == 10:
             # req_attrs = [
@@ -557,6 +555,8 @@ async def main(args):
                 try:
                     name = input("Enter Schema Name: \n")
                     attrs = input("Enter space separated fields for the schema: \n").split()
+                    if "Timestamp" not in attrs:
+                        attrs.append("Timestamp")
                     ids[name] = await pes_agent.create_schema_and_cred_def(
                             schema_name=name,
                             schema_attrs=attrs,
