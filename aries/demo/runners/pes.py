@@ -188,6 +188,8 @@ class PesAgent(AriesAgent):
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d"
+        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
+
         print("Enter the type of credential you want proof for")
         for key in schemas.keys():
             print(key)
@@ -202,6 +204,16 @@ class PesAgent(AriesAgent):
                         "name": attr,
                         "p_type": ">=",
                         "p_value": 1630000000,
+                        "restrictions": [{"schema_name": type}],
+                    }
+                )
+                continue
+            if attr == "CGPA":
+                req_preds.append(
+                    {
+                        "name": attr,
+                        "p_type": ">=",
+                        "p_value": 8,
                         "restrictions": [{"schema_name": type}],
                     }
                 )
@@ -567,6 +579,7 @@ async def main(args):
                 
             elif option == "1":
                 log_status("#13 Issue credential offer to X")
+                
                 if pes_agent.aip == 10:
                     offer_request = pes_agent.agent.generate_credential_offer(
                         pes_agent.aip, None, pes_agent.cred_def_id, exchange_tracing
