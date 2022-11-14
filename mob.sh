@@ -22,7 +22,7 @@ cd ../../aries/demo
 
 
 # start organisation
-if [ "$1" = "faber" ]; then
+if [ "$1" = "school" ]; then
   AGENT_PORT=8020
 
 elif [ "$1" = "pes" ]; then
@@ -38,7 +38,7 @@ elif [ "$1" = "performance" ]; then
   AGENT_PORT=8050
 
 else
-  echo "Please specify which agent you want to run. Choose from 'faber', 'pes', 'alice', 'acme', or 'performance'."
+  echo "Please specify which agent you want to run. Choose from 'school', 'pes', 'alice', 'acme', or 'performance'."
   exit 1
 fi
 

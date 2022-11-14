@@ -89,7 +89,7 @@ do
     continue
   ;;
   --bg)
-    if [ "${AGENT}" = "alice" ] || [ "${AGENT}" = "faber" ] || [ "${AGENT}" = "acme" ]; then
+    if [ "${AGENT}" = "alice" ] || [ "${AGENT}" = "school" ] || [ "${AGENT}" = "acme" ]; then
       DOCKER_OPTS="-d"
       echo -e "\nRunning in ${AGENT} in the background. Note that you cannot use the command line console in this mode."
       echo To see the logs use: \"docker logs ${AGENT}\".
@@ -97,7 +97,7 @@ do
       echo To stop the agent, use: \"docker stop ${AGENT}\". The docker environment will
       echo -e "be removed on stop.\n\n"
     else
-      echo The "bg" option \(for running docker in detached mode\) is only for agents Alice, Faber and Acme.
+      echo The "bg" option \(for running docker in detached mode\) is only for agents Alice, school and Acme.
       echo Ignoring...
     fi
     continue
@@ -108,7 +108,7 @@ do
 Usage:
    ./run_demo <agent> [OPTIONS]
 
-   - <agent> is one of alice, faber, pes, acme, performance.
+   - <agent> is one of alice, school, pes, acme, performance.
    - Options:
       --events - display on the terminal the webhook events from the ACA-Py agent.
       --timing - at the end of the run, display timing; relevant to the "performance" agent.
@@ -127,8 +127,8 @@ EOF
   ARGS="${ARGS:+$ARGS }$i"
 done
 
-if [ "$AGENT" = "faber" ]; then
-  AGENT_MODULE="faber"
+if [ "$AGENT" = "school" ]; then
+  AGENT_MODULE="school"
   AGENT_PORT=8020
   AGENT_PORT_RANGE=8020-8029
 
@@ -153,7 +153,7 @@ elif [ "$AGENT" = "performance" ]; then
   AGENT_PORT_RANGE=8050-8069
 
 else
-  echo "Please specify which agent you want to run. Choose from 'faber', 'pes', 'alice', 'acme', or 'performance'."
+  echo "Please specify which agent you want to run. Choose from 'school', 'pes', 'alice', 'acme', or 'performance'."
   exit 1
 fi
 
