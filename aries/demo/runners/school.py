@@ -36,6 +36,11 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
+schemas = {};
+
+# how to add marks ? single attr json or multiple attributes?
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Timestamp"] 
+# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
 
 class schoolAgent(AriesAgent):
     def __init__(
@@ -79,15 +84,19 @@ class schoolAgent(AriesAgent):
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d"
+        payload = {};
+        type = "Markscard"; 
+        for attr in schemas[type]:
+            if attr == "Issued date":
+                payload[attr] = datetime.datetime.now().strftime(birth_date_format)
+                continue;
+            if attr == "Timestamp":
+                payload[attr] = str(int(time.time())) 
+                continue;
+            payload[attr] = input("Enter " + attr + ": ")
         if aip == 10:
             # define attributes to send for credential
-            self.cred_attrs[cred_def_id] = {
-                "name": "Alice Smith",
-                "date": "2018-05-28",
-                "degree": "Maths",
-                "birthdate_dateint": birth_date.strftime(birth_date_format),
-                "timestamp": str(int(time.time())),
-            }
+            self.cred_attrs[cred_def_id] = payload;
 
             cred_preview = {
                 "@type": CRED_PREVIEW_TYPE,
@@ -108,13 +117,7 @@ class schoolAgent(AriesAgent):
 
         elif aip == 20:
             if cred_type == CRED_FORMAT_INDY:
-                self.cred_attrs[cred_def_id] = {
-                    "name": "Alice Smith",
-                    "date": "2018-05-28",
-                    "degree": "Maths",
-                    "birthdate_dateint": birth_date.strftime(birth_date_format),
-                    "timestamp": str(int(time.time())),
-                }
+                self.cred_attrs[cred_def_id] = payload
 
                 cred_preview = {
                     "@type": CRED_PREVIEW_TYPE,
@@ -175,7 +178,7 @@ class schoolAgent(AriesAgent):
     def generate_proof_request_web_request(
         self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
-        SELF_ATTESTED = True;
+        # SELF_ATTESTED = True;
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
@@ -416,8 +419,8 @@ async def main(args):
             school_agent.public_did = True
             await school_agent.initialize(
                 the_agent=agent,
-                schema_name=school_schema_name,
-                schema_attrs=school_schema_attrs,
+                schema_name="Markscard",
+                schema_attrs=schemas["Markscard"],
                 create_endorser_agent=(school_agent.endorser_role == "author")
                 if school_agent.endorser_role
                 else False,
