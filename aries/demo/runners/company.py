@@ -91,7 +91,7 @@ class CompanyAgent(AriesAgent):
             if attr == "Issued date":
                 payload[attr] = datetime.datetime.now().strftime(birth_date_format)
                 continue;
-            if attr == "Timestamp":
+            if attr == "timestamp":
                 payload[attr] = str(int(time.time())) 
                 continue;
             payload[attr] = input("Enter " + attr + ": ")
@@ -181,7 +181,7 @@ class CompanyAgent(AriesAgent):
     def generate_proof_request_web_request(
         self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
-        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"]
+        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "timestamp"]
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
@@ -190,7 +190,7 @@ class CompanyAgent(AriesAgent):
         req_attrs = []
         req_preds = []
         for attr in degree:
-            if attr == "Timestamp":
+            if attr == "timestamp":
                 req_preds.append(
                     {
                         "name": attr,
@@ -549,8 +549,8 @@ async def main(args):
                 try:
                     name = input("Enter Schema Name: \n")
                     attrs = input("Enter space separated fields for the schema: \n").split()
-                    if "Timestamp" not in attrs:
-                        attrs.append("Timestamp")
+                    if "timestamp" not in attrs:
+                        attrs.append("timestamp")
                     ids[name] = await company_agent.create_schema_and_cred_def(
                             schema_name=name,
                             schema_attrs=attrs,
