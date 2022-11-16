@@ -32,7 +32,7 @@ elif [ "$1" = "alice" ]; then
   AGENT_PORT=8030
 
 elif [ "$1" = "company" ]; then
-  AGENT_PORT=8040
+  AGENT_PORT=8120
 
 elif [ "$1" = "performance" ]; then
   AGENT_PORT=8050
