@@ -57,7 +57,7 @@ class CompanyAgent(AriesAgent):
             ident,
             http_port,
             admin_port,
-            prefix="Pes",
+            prefix="Company",
             no_auto=no_auto,
             endorser_role=endorser_role,
             revocation=revocation,
@@ -181,30 +181,36 @@ class CompanyAgent(AriesAgent):
     def generate_proof_request_web_request(
         self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
+        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"]
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d" 
 
-        print("Enter the type of credential you want proof for")
-        for key in schemas.keys():
-            print(key)
-        type = input()
-
         req_attrs = []
         req_preds = []
-        for attr in schemas[type]:
+        for attr in degree:
+            if attr == "Timestamp":
+                req_preds.append(
+                    {
+                        "name": attr,
+                        "p_type": ">=",
+                        "p_value": 1630000000,
+                        "restrictions": [{"schema_name": "Degree"}],
+                    }
+                )
+                continue
             if attr == "CGPA":
                 req_preds.append(
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 8,
-                        "restrictions": [{"schema_name": type}],
+                        "p_value": 1,
+                        "restrictions": [{"schema_name": "Degree"}],
                     }
                 )
                 continue
-            req_attrs.append({"name": attr, "restrictions": [{"schema_name": type}]})
+            req_attrs.append({"name": attr, "restrictions": [{"schema_name": "Degree"}]})
         
 
         if aip == 10:
@@ -249,7 +255,7 @@ class CompanyAgent(AriesAgent):
             # ]
 
             indy_proof_request = {
-                "name": "Proof of " + type,
+                "name": "Proof of degree",
                 "version": "1.0",
                 "requested_attributes": {
                     f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -295,7 +301,7 @@ class CompanyAgent(AriesAgent):
                 #         {
                 #             "name": "degree",
                 #             "restrictions": [{"schema_name": "degree schema"}],
-                #         }
+                #       f  }
                 #     )
                 # if SELF_ATTESTED:
                 #     # test self-attested claims
@@ -312,7 +318,7 @@ class CompanyAgent(AriesAgent):
                 #     }
                 # ]
                 indy_proof_request = {
-                    "name": "Proof of " + type,
+                    "name": "Proof of Degree",
                     "version": "1.0",
                     "requested_attributes": {
                         f"0_{req_attr['name']}_uuid": req_attr for req_attr in req_attrs
@@ -814,7 +820,7 @@ if __name__ == "__main__":
             import pydevd_pycharm
 
             print(
-                "PESU remote debugging to "
+                "job remote debugging to "
                 f"{PYDEVD_PYCHARM_HOST}:{PYDEVD_PYCHARM_CONTROLLER_PORT}"
             )
             pydevd_pycharm.settrace(
