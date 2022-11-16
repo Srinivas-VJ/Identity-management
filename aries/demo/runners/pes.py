@@ -36,8 +36,12 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
-schemas = {}
+schemas = {};
 
+schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"]
+# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+# schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
+# just add whatever schema you want here
 # just add whatever schema you want here
 
 # will store cred_def_ids of different schemas
