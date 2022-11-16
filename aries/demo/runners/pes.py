@@ -36,16 +36,13 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
-schemas = {};
+schemas = {}
 
-schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
-# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
-# schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
 # just add whatever schema you want here
 
 # will store cred_def_ids of different schemas
 ids = {}
-class PesAgent(AriesAgent):
+class CompanyAgent(AriesAgent):
     def __init__(
         self,
         ident: str,
@@ -187,8 +184,7 @@ class PesAgent(AriesAgent):
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
-        birth_date_format = "%Y%m%d"
-        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
+        birth_date_format = "%Y%m%d" 
 
         print("Enter the type of credential you want proof for")
         for key in schemas.keys():
@@ -198,26 +194,16 @@ class PesAgent(AriesAgent):
         req_attrs = []
         req_preds = []
         for attr in schemas[type]:
-            if attr == "Timestamp":
+            if attr == "CGPA":
                 req_preds.append(
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 1630000000,
+                        "p_value": 8,
                         "restrictions": [{"schema_name": type}],
                     }
                 )
                 continue
-            # if attr == "CGPA":
-            #     req_preds.append(
-            #         {
-            #             "name": attr,
-            #             "p_type": ">=",
-            #             "p_value": 8,
-            #             "restrictions": [{"schema_name": type}],
-            #         }
-            #     )
-            #     continue
             req_attrs.append({"name": attr, "restrictions": [{"schema_name": type}]})
         
 
@@ -417,72 +403,62 @@ class PesAgent(AriesAgent):
 
 
 async def main(args):
-    pes_agent = await create_agent_with_args(args, ident="PES University")
+    company_agent = await create_agent_with_args(args, ident="Job Company")
 
     try:
         log_status(
             "#1 Provision an agent and wallet, get back configuration details"
             + (
-                f" (Wallet type: {pes_agent.wallet_type})"
-                if pes_agent.wallet_type
+                f" (Wallet type: {company_agent.wallet_type})"
+                if company_agent.wallet_type
                 else ""
             )
         )
-        agent = PesAgent(
-            "PES University", # name of the agent
-            pes_agent.start_port,
-            pes_agent.start_port + 1,
-            genesis_data=pes_agent.genesis_txns,
-            genesis_txn_list=pes_agent.genesis_txn_list,
-            no_auto=pes_agent.no_auto,
-            tails_server_base_url=pes_agent.tails_server_base_url,
-            revocation=pes_agent.revocation,
-            timing=pes_agent.show_timing,
-            multitenant=pes_agent.multitenant,
-            mediation=pes_agent.mediation,
-            wallet_type=pes_agent.wallet_type,
-            seed=pes_agent.seed,
-            aip=pes_agent.aip,
-            endorser_role=pes_agent.endorser_role,
+        agent = CompanyAgent(
+            "Job Company", # name of the agent
+            company_agent.start_port,
+            company_agent.start_port + 1,
+            genesis_data=company_agent.genesis_txns,
+            genesis_txn_list=company_agent.genesis_txn_list,
+            no_auto=company_agent.no_auto,
+            tails_server_base_url=company_agent.tails_server_base_url,
+            revocation=company_agent.revocation,
+            timing=company_agent.show_timing,
+            multitenant=company_agent.multitenant,
+            mediation=company_agent.mediation,
+            wallet_type=company_agent.wallet_type,
+            seed=company_agent.seed,
+            aip=company_agent.aip,
+            endorser_role=company_agent.endorser_role,
         )
 
-        # Schema definition and credential definition
-        # pes_schema_name = "Degree Schema"
-        # pes_schema_attrs = [
-        #     "Name",
-        #     "Issued_Date",
-        #     "Degree",
-        #     "DOB",
-        #     "CGPA",
-        #     "timestamp",
-        # ]
 
         
 
-        if pes_agent.cred_type == CRED_FORMAT_INDY:
-            pes_agent.public_did = True
-            await pes_agent.initialize(
+        if company_agent.cred_type == CRED_FORMAT_INDY:
+            company_agent.public_did = True
+            await company_agent.initialize(
                 the_agent=agent,
                 schema_name = None,
                 schema_attrs = None,
-                create_endorser_agent=(pes_agent.endorser_role == "author")
-                if pes_agent.endorser_role
+                create_endorser_agent=(company_agent.endorser_role == "author")
+                if company_agent.endorser_role
                 else False,
             )
-        elif pes_agent.cred_type == CRED_FORMAT_JSON_LD:
-            pes_agent.public_did = True
-            await pes_agent.initialize(the_agent=agent)
+        elif company_agent.cred_type == CRED_FORMAT_JSON_LD:
+            company_agent.public_did = True
+            await company_agent.initialize(the_agent=agent)
         else:
-            raise Exception("Invalid credential type:" + pes_agent.cred_type)
+            raise Exception("Invalid credential type:" + company_agent.cred_type)
         
         # register schemas and cred defs
         for schema in schemas.keys():
-            ids[schema] = await pes_agent.create_schema_and_cred_def(schema, schemas[schema])
+            ids[schema] = await company_agent.create_schema_and_cred_def(schema, schemas[schema])
         # print(ids);
 
         # generate an invitation for Alice
-        await pes_agent.generate_invitation(
-            display_qr=True, reuse_connections=pes_agent.reuse_connections, wait=True
+        await company_agent.generate_invitation(
+            display_qr=True, reuse_connections=company_agent.reuse_connections, wait=True
         )
 
         exchange_tracing = False
@@ -495,16 +471,16 @@ async def main(args):
             "    (3) Send Message\n"
             "    (4) Create New Invitation\n"
         )
-        if pes_agent.revocation:
+        if company_agent.revocation:
             options += "    (5) Revoke Credential\n" "    (6) Publish Revocations\n"
-        if pes_agent.endorser_role and pes_agent.endorser_role == "author":
+        if company_agent.endorser_role and company_agent.endorser_role == "author":
             options += "    (D) Set Endorser's DID\n"
-        if pes_agent.multitenant:
+        if company_agent.multitenant:
             options += "    (W) Create and/or Enable Wallet\n"
         options += "    (T) Toggle tracing on credential/proof exchange\n"
         options += "    (X) Exit?\n[1/2/3/4/{}{}T/X] ".format(
-            "5/6/" if pes_agent.revocation else "",
-            "W/" if pes_agent.multitenant else "",
+            "5/6/" if company_agent.revocation else "",
+            "W/" if company_agent.multitenant else "",
         )
         async for option in prompt_loop(options):
             if option is not None:
@@ -513,35 +489,35 @@ async def main(args):
             if option is None or option in "xX":
                 break
 
-            elif option in "dD" and pes_agent.endorser_role:
+            elif option in "dD" and company_agent.endorser_role:
                 endorser_did = await prompt("Enter Endorser's DID: ")
-                await pes_agent.agent.admin_POST(
-                    f"/transactions/{pes_agent.agent.connection_id}/set-endorser-info",
+                await company_agent.agent.admin_POST(
+                    f"/transactions/{company_agent.agent.connection_id}/set-endorser-info",
                     params={"endorser_did": endorser_did},
                 )
 
-            elif option in "wW" and pes_agent.multitenant:
+            elif option in "wW" and company_agent.multitenant:
                 target_wallet_name = await prompt("Enter wallet name: ")
                 include_subwallet_webhook = await prompt(
                     "(Y/N) Create sub-wallet webhook target: "
                 )
                 if include_subwallet_webhook.lower() == "y":
-                    created = await pes_agent.agent.register_or_switch_wallet(
+                    created = await company_agent.agent.register_or_switch_wallet(
                         target_wallet_name,
-                        webhook_port=pes_agent.agent.get_new_webhook_port(),
+                        webhook_port=company_agent.agent.get_new_webhook_port(),
                         public_did=True,
-                        mediator_agent=pes_agent.mediator_agent,
-                        endorser_agent=pes_agent.endorser_agent,
-                        taa_accept=pes_agent.taa_accept,
+                        mediator_agent=company_agent.mediator_agent,
+                        endorser_agent=company_agent.endorser_agent,
+                        taa_accept=company_agent.taa_accept,
                     )
                 else:
-                    created = await pes_agent.agent.register_or_switch_wallet(
+                    created = await company_agent.agent.register_or_switch_wallet(
                         target_wallet_name,
                         public_did=True,
-                        mediator_agent=pes_agent.mediator_agent,
-                        endorser_agent=pes_agent.endorser_agent,
-                        cred_type=pes_agent.cred_type,
-                        taa_accept=pes_agent.taa_accept,
+                        mediator_agent=company_agent.mediator_agent,
+                        endorser_agent=company_agent.endorser_agent,
+                        cred_type=company_agent.cred_type,
+                        taa_accept=company_agent.taa_accept,
                     )
                 # create a schema and cred def for the new wallet
                 # TODO check first in case we are switching between existing wallets
@@ -549,7 +525,7 @@ async def main(args):
                     # TODO this fails because the new wallet doesn't get a public DID
                     # print("i am here and the lord is with me")
                     for schema in schemas.keys():
-                        await pes_agent.create_schema_and_cred_def(
+                        await company_agent.create_schema_and_cred_def(
                             schema_name=schema,
                             schema_attrs=schemas[schema],
                         )
@@ -569,7 +545,7 @@ async def main(args):
                     attrs = input("Enter space separated fields for the schema: \n").split()
                     if "Timestamp" not in attrs:
                         attrs.append("Timestamp")
-                    ids[name] = await pes_agent.create_schema_and_cred_def(
+                    ids[name] = await company_agent.create_schema_and_cred_def(
                             schema_name=name,
                             schema_attrs=attrs,
                         )
@@ -580,83 +556,83 @@ async def main(args):
             elif option == "1":
                 log_status("#13 Issue credential offer to X")
                 
-                if pes_agent.aip == 10:
-                    offer_request = pes_agent.agent.generate_credential_offer(
-                        pes_agent.aip, None, pes_agent.cred_def_id, exchange_tracing
+                if company_agent.aip == 10:
+                    offer_request = company_agent.agent.generate_credential_offer(
+                        company_agent.aip, None, company_agent.cred_def_id, exchange_tracing
                     )
-                    await pes_agent.agent.admin_POST(
+                    await company_agent.agent.admin_POST(
                         "/issue-credential/send-offer", offer_request
                     )
 
-                elif pes_agent.aip == 20:
-                    if pes_agent.cred_type == CRED_FORMAT_INDY:
-                        offer_request = pes_agent.agent.generate_credential_offer(
-                            pes_agent.aip,
-                            pes_agent.cred_type,
-                            pes_agent.cred_def_id,
+                elif company_agent.aip == 20:
+                    if company_agent.cred_type == CRED_FORMAT_INDY:
+                        offer_request = company_agent.agent.generate_credential_offer(
+                            company_agent.aip,
+                            company_agent.cred_type,
+                            company_agent.cred_def_id,
                             exchange_tracing,
                         )
 
-                    elif pes_agent.cred_type == CRED_FORMAT_JSON_LD:
-                        offer_request = pes_agent.agent.generate_credential_offer(
-                            pes_agent.aip,
-                            pes_agent.cred_type,
+                    elif company_agent.cred_type == CRED_FORMAT_JSON_LD:
+                        offer_request = company_agent.agent.generate_credential_offer(
+                            company_agent.aip,
+                            company_agent.cred_type,
                             None,
                             exchange_tracing,
                         )
 
                     else:
                         raise Exception(
-                            f"Error invalid credential type: {pes_agent.cred_type}"
+                            f"Error invalid credential type: {company_agent.cred_type}"
                         )
 
-                    await pes_agent.agent.admin_POST(
+                    await company_agent.agent.admin_POST(
                         "/issue-credential-2.0/send-offer", offer_request
                     )
 
                 else:
-                    raise Exception(f"Error invalid AIP level: {pes_agent.aip}")
+                    raise Exception(f"Error invalid AIP level: {company_agent.aip}")
 
             elif option == "2":
                 log_status("#20 Request proof of degree from alice")
-                if pes_agent.aip == 10:
+                if company_agent.aip == 10:
                     proof_request_web_request = (
-                        pes_agent.agent.generate_proof_request_web_request(
-                            pes_agent.aip,
-                            pes_agent.cred_type,
-                            pes_agent.revocation,
+                        company_agent.agent.generate_proof_request_web_request(
+                            company_agent.aip,
+                            company_agent.cred_type,
+                            company_agent.revocation,
                             exchange_tracing,
                         )
                     )
-                    await pes_agent.agent.admin_POST(
+                    await company_agent.agent.admin_POST(
                         "/present-proof/send-request", proof_request_web_request
                     )
                     pass
 
-                elif pes_agent.aip == 20:
-                    if pes_agent.cred_type == CRED_FORMAT_INDY:
+                elif company_agent.aip == 20:
+                    if company_agent.cred_type == CRED_FORMAT_INDY:
                         proof_request_web_request = (
-                            pes_agent.agent.generate_proof_request_web_request(
-                                pes_agent.aip,
-                                pes_agent.cred_type,
-                                pes_agent.revocation,
+                            company_agent.agent.generate_proof_request_web_request(
+                                company_agent.aip,
+                                company_agent.cred_type,
+                                company_agent.revocation,
                                 exchange_tracing,
                             )
                         )
 
-                    elif pes_agent.cred_type == CRED_FORMAT_JSON_LD:
+                    elif company_agent.cred_type == CRED_FORMAT_JSON_LD:
                         proof_request_web_request = (
-                            pes_agent.agent.generate_proof_request_web_request(
-                                pes_agent.aip,
-                                pes_agent.cred_type,
-                                pes_agent.revocation,
+                            company_agent.agent.generate_proof_request_web_request(
+                                company_agent.aip,
+                                company_agent.cred_type,
+                                company_agent.revocation,
                                 exchange_tracing,
                             )
                         )
 
                     else:
                         raise Exception(
-                            "Error invalid credential type:" + pes_agent.cred_type
+                            "Error invalid credential type:" + company_agent.cred_type
                         )
 
                     await agent.admin_POST(
@@ -664,21 +640,21 @@ async def main(args):
                     )
 
                 else:
-                    raise Exception(f"Error invalid AIP level: {pes_agent.aip}")
+                    raise Exception(f"Error invalid AIP level: {company_agent.aip}")
 
             elif option == "2a":
                 log_status("#20 Request * Connectionless * proof of degree from alice")
-                if pes_agent.aip == 10:
+                if company_agent.aip == 10:
                     proof_request_web_request = (
-                        pes_agent.agent.generate_proof_request_web_request(
-                            pes_agent.aip,
-                            pes_agent.cred_type,
-                            pes_agent.revocation,
+                        company_agent.agent.generate_proof_request_web_request(
+                            company_agent.aip,
+                            company_agent.cred_type,
+                            company_agent.revocation,
                             exchange_tracing,
                             connectionless=True,
                         )
                     )
-                    proof_request = await pes_agent.agent.admin_POST(
+                    proof_request = await company_agent.agent.admin_POST(
                         "/present-proof/create-request", proof_request_web_request
                     )
                     pres_req_id = proof_request["presentation_exchange_id"]
@@ -687,7 +663,7 @@ async def main(args):
                         or (
                             "http://"
                             + os.getenv("DOCKERHOST").replace(
-                                "{PORT}", str(pes_agent.agent.admin_port + 1)
+                                "{PORT}", str(company_agent.agent.admin_port + 1)
                             )
                             + "/webhooks"
                         )
@@ -700,40 +676,40 @@ async def main(args):
                     )
                     qr.print_ascii(invert=True)
 
-                elif pes_agent.aip == 20:
-                    if pes_agent.cred_type == CRED_FORMAT_INDY:
+                elif company_agent.aip == 20:
+                    if company_agent.cred_type == CRED_FORMAT_INDY:
                         proof_request_web_request = (
-                            pes_agent.agent.generate_proof_request_web_request(
-                                pes_agent.aip,
-                                pes_agent.cred_type,
-                                pes_agent.revocation,
+                            company_agent.agent.generate_proof_request_web_request(
+                                company_agent.aip,
+                                company_agent.cred_type,
+                                company_agent.revocation,
                                 exchange_tracing,
                                 connectionless=True,
                             )
                         )
-                    elif pes_agent.cred_type == CRED_FORMAT_JSON_LD:
+                    elif company_agent.cred_type == CRED_FORMAT_JSON_LD:
                         proof_request_web_request = (
-                            pes_agent.agent.generate_proof_request_web_request(
-                                pes_agent.aip,
-                                pes_agent.cred_type,
-                                pes_agent.revocation,
+                            company_agent.agent.generate_proof_request_web_request(
+                                company_agent.aip,
+                                company_agent.cred_type,
+                                company_agent.revocation,
                                 exchange_tracing,
                                 connectionless=True,
                             )
                         )
                     else:
                         raise Exception(
-                            "Error invalid credential type:" + pes_agent.cred_type
+                            "Error invalid credential type:" + company_agent.cred_type
                         )
 
-                    proof_request = await pes_agent.agent.admin_POST(
+                    proof_request = await company_agent.agent.admin_POST(
                         "/present-proof-2.0/create-request", proof_request_web_request
                     )
                     pres_req_id = proof_request["pres_ex_id"]
                     url = (
                         "http://"
                         + os.getenv("DOCKERHOST").replace(
-                            "{PORT}", str(pes_agent.agent.admin_port + 1)
+                            "{PORT}", str(company_agent.agent.admin_port + 1)
                         )
                         + "/webhooks/pres_req/"
                         + pres_req_id
@@ -747,12 +723,12 @@ async def main(args):
                     )
                     qr.print_ascii(invert=True)
                 else:
-                    raise Exception(f"Error invalid AIP level: {pes_agent.aip}")
+                    raise Exception(f"Error invalid AIP level: {company_agent.aip}")
 
             elif option == "3":
                 msg = await prompt("Enter message: ")
-                await pes_agent.agent.admin_POST(
-                    f"/connections/{pes_agent.agent.connection_id}/send-message",
+                await company_agent.agent.admin_POST(
+                    f"/connections/{company_agent.agent.connection_id}/send-message",
                     {"content": msg},
                 )
 
@@ -761,26 +737,26 @@ async def main(args):
                     "Creating a new invitation, please receive "
                     "and accept this invitation using Alice agent"
                 )
-                await pes_agent.generate_invitation(
+                await company_agent.generate_invitation(
                     display_qr=True,
-                    reuse_connections=pes_agent.reuse_connections,
+                    reuse_connections=company_agent.reuse_connections,
                     wait=True,
                 )
 
-            elif option == "5" and pes_agent.revocation:
+            elif option == "5" and company_agent.revocation:
                 rev_reg_id = (await prompt("Enter revocation registry ID: ")).strip()
                 cred_rev_id = (await prompt("Enter credential revocation ID: ")).strip()
                 publish = (
                     await prompt("Publish now? [Y/N]: ", default="N")
                 ).strip() in "yY"
                 try:
-                    await pes_agent.agent.admin_POST(
+                    await company_agent.agent.admin_POST(
                         "/revocation/revoke",
                         {
                             "rev_reg_id": rev_reg_id,
                             "cred_rev_id": cred_rev_id,
                             "publish": publish,
-                            "connection_id": pes_agent.agent.connection_id,
+                            "connection_id": company_agent.agent.connection_id,
                             # leave out thread_id, let aca-py generate
                             # "thread_id": "12345678-4444-4444-4444-123456789012",
                             "comment": "Revocation reason goes here ...",
@@ -789,12 +765,12 @@ async def main(args):
                 except ClientError:
                     pass
 
-            elif option == "6" and pes_agent.revocation:
+            elif option == "6" and company_agent.revocation:
                 try:
-                    resp = await pes_agent.agent.admin_POST(
+                    resp = await company_agent.agent.admin_POST(
                         "/revocation/publish-revocations", {}
                     )
-                    pes_agent.agent.log(
+                    company_agent.agent.log(
                         "Published revocations for {} revocation registr{} {}".format(
                             len(resp["rrid2crid"]),
                             "y" if len(resp["rrid2crid"]) == 1 else "ies",
@@ -804,14 +780,14 @@ async def main(args):
                 except ClientError:
                     pass
 
-        if pes_agent.show_timing:
-            timing = await pes_agent.agent.fetch_timing()
+        if company_agent.show_timing:
+            timing = await company_agent.agent.fetch_timing()
             if timing:
-                for line in pes_agent.agent.format_timing(timing):
+                for line in company_agent.agent.format_timing(timing):
                     log_msg(line)
 
     finally:
-        terminated = await pes_agent.terminate()
+        terminated = await company_agent.terminate()
 
     await asyncio.sleep(0.1)
 
