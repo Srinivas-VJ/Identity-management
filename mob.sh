@@ -31,7 +31,7 @@ elif [ "$1" = "pes" ]; then
 elif [ "$1" = "alice" ]; then
   AGENT_PORT=8030
 
-elif [ "$1" = "acme" ]; then
+elif [ "$1" = "company" ]; then
   AGENT_PORT=8040
 
 elif [ "$1" = "performance" ]; then

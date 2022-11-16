@@ -108,7 +108,7 @@ do
 Usage:
    ./run_demo <agent> [OPTIONS]
 
-   - <agent> is one of alice, school, pes, acme, performance.
+   - <agent> is one of alice, school, pes, company, performance.
    - Options:
       --events - display on the terminal the webhook events from the ACA-Py agent.
       --timing - at the end of the run, display timing; relevant to the "performance" agent.
@@ -142,8 +142,8 @@ elif [ "$AGENT" = "alice" ]; then
   AGENT_PORT=8030
   AGENT_PORT_RANGE=8030-8039
 
-elif [ "$AGENT" = "acme" ]; then
-  AGENT_MODULE="acme"
+elif [ "$AGENT" = "company" ]; then
+  AGENT_MODULE="company"
   AGENT_PORT=8040
   AGENT_PORT_RANGE=8040-8049
 
