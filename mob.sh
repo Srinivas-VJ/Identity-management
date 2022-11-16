@@ -49,7 +49,7 @@ echo "started ngrok"
 sleep 3
 
 # TEST NETWORK
-TAILS_NETWORK=docker_tails-server LEDGER_URL=http://test.bcovrin.vonx.io ./run_demo "$1" --aip 10 --revocation --events
+TAILS_NETWORK=docker_tails-server LEDGER_URL=http://test.bcovrin.vonx.io ./run_demo "$1" --aip 10 --revocation 
 
 # DEV METWORK
 # TAILS_NETWORK=docker_tails-server LEDGER_URL=http://dev.bcovrin.vonx.io ./run_demo "$1" --aip 10 --revocation --events

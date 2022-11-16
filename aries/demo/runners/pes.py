@@ -208,16 +208,16 @@ class PesAgent(AriesAgent):
                     }
                 )
                 continue
-            if attr == "CGPA":
-                req_preds.append(
-                    {
-                        "name": attr,
-                        "p_type": ">=",
-                        "p_value": 8,
-                        "restrictions": [{"schema_name": type}],
-                    }
-                )
-                continue
+            # if attr == "CGPA":
+            #     req_preds.append(
+            #         {
+            #             "name": attr,
+            #             "p_type": ">=",
+            #             "p_value": 8,
+            #             "restrictions": [{"schema_name": type}],
+            #         }
+            #     )
+            #     continue
             req_attrs.append({"name": attr, "restrictions": [{"schema_name": type}]})
         
 
