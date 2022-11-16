@@ -38,6 +38,9 @@ LOGGER = logging.getLogger(__name__)
 
 schemas = {}
 
+schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"] 
+# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+# schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
 # just add whatever schema you want here
 
 # will store cred_def_ids of different schemas
@@ -184,7 +187,8 @@ class PesAgent(AriesAgent):
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
-        birth_date_format = "%Y%m%d" 
+        birth_date_format = "%Y%m%d"
+        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
 
         print("Enter the type of credential you want proof for")
         for key in schemas.keys():
