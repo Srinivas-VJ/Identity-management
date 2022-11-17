@@ -6,6 +6,7 @@ import sys
 import time
 import datetime
 
+from collections import OrderedDict
 from aiohttp import ClientError
 from qrcode import QRCode
 
@@ -36,10 +37,10 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
-schemas = {};
+schemas = OrderedDict()
 
 # how to add marks ? single attr json or multiple attributes?
-schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"] 
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Maths" , "Eng" , "Science", "CS", "Second language", "timestamp"] 
 # schemas["test"] = ["Name", "gender", "DOB", "timestamp"];
 
 class schoolAgent(AriesAgent):
@@ -93,6 +94,9 @@ class schoolAgent(AriesAgent):
             if attr == "timestamp":
                 payload[attr] = str(int(time.time())) 
                 continue;
+            if attr == "DOB":
+                tempDob = input("Enter " + attr + "(in YYYY/MM/DD format): ").split("/")
+                payload[attr] = "".join(tempDob)
             payload[attr] = input("Enter " + attr + ": ")
         if aip == 10:
             # define attributes to send for credential
@@ -176,7 +180,7 @@ class schoolAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=True
     ):
         # SELF_ATTESTED = True;
         age = 18

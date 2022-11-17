@@ -6,6 +6,7 @@ import sys
 import time
 import datetime
 
+from collections import OrderedDict
 from aiohttp import ClientError
 from qrcode import QRCode
 
@@ -36,7 +37,7 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
-schemas = {};
+schemas = OrderedDict()
 
 schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "Percentage", "timestamp"]
 schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"]
@@ -95,10 +96,13 @@ class PesAgent(AriesAgent):
         for attr in schemas[type]:
             if attr == "Issued date":
                 payload[attr] = datetime.datetime.now().strftime(birth_date_format)
-                continue;
+                continue
             if attr == "timestamp":
                 payload[attr] = str(int(time.time())) 
-                continue;
+                continue
+            if attr == "DOB":
+                tempDob = input("Enter " + attr + "(in YYYY/MM/DD format): ").split("/")
+                payload[attr] = "".join(tempDob)
             payload[attr] = input("Enter " + attr + ": ")
         if aip == 10:
             # define attributes to send for credential
@@ -184,7 +188,7 @@ class PesAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=True
     ):
         age = 18
         d = datetime.date.today()
