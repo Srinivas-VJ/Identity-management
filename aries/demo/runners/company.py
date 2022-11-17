@@ -6,6 +6,7 @@ import sys
 import time
 import datetime
 
+from collections import OrderedDict
 from aiohttp import ClientError
 from qrcode import QRCode
 
@@ -36,7 +37,7 @@ TAILS_FILE_COUNT = int(os.getenv("TAILS_FILE_COUNT", 100))
 logging.basicConfig(level=logging.WARNING)
 LOGGER = logging.getLogger(__name__)
 
-schemas = {}
+schemas = OrderedDict()
 
 # just add whatever schema you want here
 
@@ -179,9 +180,9 @@ class CompanyAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=True
     ):
-        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "timestamp"]
+        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "Percentage", "timestamp"]
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
@@ -200,12 +201,12 @@ class CompanyAgent(AriesAgent):
                     }
                 )
                 continue
-            if attr == "CGPA":
+            if attr == "Percentage":
                 req_preds.append(
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 1,
+                        "p_value": 85,
                         "restrictions": [{"schema_name": "Degree"}],
                     }
                 )
