@@ -97,6 +97,7 @@ class schoolAgent(AriesAgent):
             if attr == "DOB":
                 tempDob = input("Enter " + attr + "(in YYYY/MM/DD format): ").split("/")
                 payload[attr] = "".join(tempDob)
+                continue
             payload[attr] = input("Enter " + attr + ": ")
         if aip == 10:
             # define attributes to send for credential
@@ -180,7 +181,7 @@ class schoolAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=True
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
         # SELF_ATTESTED = True;
         age = 18

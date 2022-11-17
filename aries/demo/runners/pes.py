@@ -40,7 +40,7 @@ LOGGER = logging.getLogger(__name__)
 schemas = OrderedDict()
 
 schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "Percentage", "timestamp"]
-schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"]
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Maths" , "Eng" , "Science", "CS", "Second language", "timestamp"] 
 # schemas["test"] = ["Name", "gender", "DOB", "timestamp"];
 # schemas["Certi"] = ["Naisde", "gender", "DOB", "timestamp", "ajkhsdbo"];
 # just add whatever schema you want here
@@ -103,6 +103,7 @@ class PesAgent(AriesAgent):
             if attr == "DOB":
                 tempDob = input("Enter " + attr + "(in YYYY/MM/DD format): ").split("/")
                 payload[attr] = "".join(tempDob)
+                continue
             payload[attr] = input("Enter " + attr + ": ")
         if aip == 10:
             # define attributes to send for credential
@@ -188,13 +189,13 @@ class PesAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=True
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d"
-        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
+        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Maths" , "Eng" , "Science", "CS", "Second language", "timestamp"] 
 
         print("Enter the type of credential you want proof for")
         for key in schemas.keys():
@@ -219,7 +220,7 @@ class PesAgent(AriesAgent):
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 95,
+                        "p_value": 75,
                         "restrictions": [{"schema_name": type}],
                     }
                 )
