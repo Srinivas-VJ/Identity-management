@@ -180,7 +180,7 @@ class CompanyAgent(AriesAgent):
             raise Exception(f"Error invalid AIP level: {self.aip}")
 
     def generate_proof_request_web_request(
-        self, aip, cred_type, revocation, exchange_tracing, connectionless=True
+        self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
         degree = ["Name", "Issued date", "Degree", "Major", "DOB", "Percentage", "timestamp"]
         age = 18
