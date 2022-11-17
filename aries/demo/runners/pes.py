@@ -38,9 +38,10 @@ LOGGER = logging.getLogger(__name__)
 
 schemas = {};
 
-schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "Timestamp"]
-# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
-# schemas["Certi"] = ["Naisde", "gender", "DOB", "Timestamp", "ajkhsdbo"];
+schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "timestamp"]
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"]
+# schemas["test"] = ["Name", "gender", "DOB", "timestamp"];
+# schemas["Certi"] = ["Naisde", "gender", "DOB", "timestamp", "ajkhsdbo"];
 # just add whatever schema you want here
 # just add whatever schema you want here
 
@@ -95,7 +96,7 @@ class PesAgent(AriesAgent):
             if attr == "Issued date":
                 payload[attr] = datetime.datetime.now().strftime(birth_date_format)
                 continue;
-            if attr == "Timestamp":
+            if attr == "timestamp":
                 payload[attr] = str(int(time.time())) 
                 continue;
             payload[attr] = input("Enter " + attr + ": ")
@@ -199,22 +200,22 @@ class PesAgent(AriesAgent):
         req_attrs = []
         req_preds = []
         for attr in schemas[type]:
-            # if attr == "Timestamp":
-            #     req_preds.append(
-            #         {
-            #             "name": attr,
-            #             "p_type": ">=",
-            #             "p_value": 1630000000,
-            #             "restrictions": [{"schema_name": type}],
-            #         }
-            #     )
-            #     continue
+            if attr == "timestamp":
+                req_preds.append(
+                    {
+                        "name": attr,
+                        "p_type": ">=",
+                        "p_value": 1630000000,
+                        "restrictions": [{"schema_name": type}],
+                    }
+                )
+                continue
             if attr == "CGPA":
                 req_preds.append(
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 9,
+                        "p_value": 8,
                         "restrictions": [{"schema_name": type}],
                     }
                 )
@@ -568,8 +569,8 @@ async def main(args):
                 try:
                     name = input("Enter Schema Name: \n")
                     attrs = input("Enter space separated fields for the schema: \n").split()
-                    if "Timestamp" not in attrs:
-                        attrs.append("Timestamp")
+                    if "timestamp" not in attrs:
+                        attrs.append("timestamp")
                     ids[name] = await pes_agent.create_schema_and_cred_def(
                             schema_name=name,
                             schema_attrs=attrs,

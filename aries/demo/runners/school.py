@@ -39,8 +39,8 @@ LOGGER = logging.getLogger(__name__)
 schemas = {};
 
 # how to add marks ? single attr json or multiple attributes?
-schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
-# schemas["test"] = ["Name", "gender", "DOB", "Timestamp"];
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"] 
+# schemas["test"] = ["Name", "gender", "DOB", "timestamp"];
 
 class schoolAgent(AriesAgent):
     def __init__(
@@ -90,7 +90,7 @@ class schoolAgent(AriesAgent):
             if attr == "Issued date":
                 payload[attr] = datetime.datetime.now().strftime(birth_date_format)
                 continue;
-            if attr == "Timestamp":
+            if attr == "timestamp":
                 payload[attr] = str(int(time.time())) 
                 continue;
             payload[attr] = input("Enter " + attr + ": ")
@@ -378,7 +378,7 @@ class schoolAgent(AriesAgent):
 
 
 async def main(args):
-    school_agent = await create_agent_with_args(args, ident="school")
+    school_agent = await create_agent_with_args(args, ident="School")
 
     try:
         log_status(
@@ -438,10 +438,8 @@ async def main(args):
 
         exchange_tracing = False
         options = (
-            "    (1) Issue Credential\n"
+            "    (1) Issue Markscard\n"
             "    (2) Send Proof Request\n"
-            "    (2a) Send *Connectionless* Proof Request (requires a Mobile client)\n"
-            "    (3) Send Message\n"
             "    (4) Create New Invitation\n"
         )
         if school_agent.revocation:
