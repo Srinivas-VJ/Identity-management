@@ -39,7 +39,7 @@ LOGGER = logging.getLogger(__name__)
 schemas = {};
 
 # how to add marks ? single attr json or multiple attributes?
-schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"] 
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"] 
 # schemas["test"] = ["Name", "gender", "DOB", "timestamp"];
 
 class schoolAgent(AriesAgent):

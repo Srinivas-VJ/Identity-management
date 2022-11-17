@@ -38,8 +38,8 @@ LOGGER = logging.getLogger(__name__)
 
 schemas = {};
 
-schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "timestamp"]
-schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"]
+schemas["Degree"] = ["Name", "Issued date", "Degree", "Major", "DOB", "Percentage", "timestamp"]
+schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage", "Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "timestamp"]
 # schemas["test"] = ["Name", "gender", "DOB", "timestamp"];
 # schemas["Certi"] = ["Naisde", "gender", "DOB", "timestamp", "ajkhsdbo"];
 # just add whatever schema you want here
@@ -190,7 +190,7 @@ class PesAgent(AriesAgent):
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
         birth_date_format = "%Y%m%d"
-        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "CGPA","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
+        schemas["Markscard"] = ["Name", "Issued date", "Board", "DOB", "Percentage","Overall Result", "Mathematics" , "English" , "Science", "Computer Science", "Second language", "Timestamp"] 
 
         print("Enter the type of credential you want proof for")
         for key in schemas.keys():
@@ -210,12 +210,12 @@ class PesAgent(AriesAgent):
                     }
                 )
                 continue
-            if attr == "CGPA":
+            if attr == "Percentage":
                 req_preds.append(
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 8,
+                        "p_value": 95,
                         "restrictions": [{"schema_name": type}],
                     }
                 )

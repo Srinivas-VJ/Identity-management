@@ -181,7 +181,7 @@ class CompanyAgent(AriesAgent):
     def generate_proof_request_web_request(
         self, aip, cred_type, revocation, exchange_tracing, connectionless=False
     ):
-        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "CGPA", "timestamp"]
+        degree = ["Name", "Issued date", "Degree", "Major", "DOB", "Percentage", "timestamp"]
         age = 18
         d = datetime.date.today()
         birth_date = datetime.date(d.year - age, d.month, d.day)
@@ -200,12 +200,12 @@ class CompanyAgent(AriesAgent):
                     }
                 )
                 continue
-            if attr == "CGPA":
+            if attr == "Percentage":
                 req_preds.append(
                     {
                         "name": attr,
                         "p_type": ">=",
-                        "p_value": 1,
+                        "p_value": 85,
                         "restrictions": [{"schema_name": "Degree"}],
                     }
                 )
